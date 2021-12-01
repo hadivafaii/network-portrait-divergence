@@ -22,26 +22,27 @@ def portrait_cpp(graph, fname=None, keepfile=False):
     j nodes in shell i
     """
     # file to save to:
-    f = fname
     if fname is None:
-        f = next(tempfile._get_candidate_names())
+        fname = next(tempfile._get_candidate_names())
     
     # make sure nodes are 0,...,N-1 integers:
     graph = nx.convert_node_labels_to_integers(graph)
     
     # write edgelist:
-    nx.write_edgelist(graph, f+".edgelist", data=False)
+    nx.write_edgelist(graph, f"/tmp/{fname}.edgelist", data=False)
     
     # make B-matrix:
-    os.system("./B_matrix {}.edgelist {}.Bmat > /dev/null".format(f, f))
-    portrait = np.loadtxt("{}.Bmat".format(f))
+    cmd = '/home/hadi/Dropbox/git/network-portrait-divergence'
+    cmd = f"{cmd}/B_matrix.out /tmp/{fname}.edgelist /tmp/{fname}.Bmat"
+    os.system(cmd)
+    bmat = np.loadtxt(f"/tmp/{fname}.Bmat")
     
     # clean up:
     if not keepfile:
-        os.remove(f+".edgelist")
-        os.remove(f+".Bmat")
+        os.remove(f"/tmp/{fname}.edgelist")
+        os.remove(f"/tmp/{fname}.Bmat")
     
-    return portrait
+    return bmat
 
 
 def portrait_py(graph):
